@@ -9,231 +9,281 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0b0a;
-  --bg2:#141210;
-  --bg3:#1c1916;
-  --border:#2e2820;
-  --border2:#3d3530;
-  --text:#d4cdc4;
-  --text2:#8a8278;
-  --text3:#5a554f;
-  --accent:#c8a96e;
-  --accent2:#8a6d3e;
-  --red:#b04040;
-  --green:#5a8a5a;
+  --bg:#0d0b0a;--bg2:#141210;--bg3:#1c1916;
+  --border:#2e2820;--border2:#3d3530;
+  --text:#d4cdc4;--text2:#8a8278;--text3:#5a554f;
+  --accent:#c8a96e;--accent2:#8a6d3e;
   --mono:'Courier Prime',monospace;
   --serif:'Libre Baskerville',serif;
 }
-html,body{height:100%;background:var(--bg)}
-body{font-family:var(--serif);color:var(--text);overflow:hidden}
+html{height:100%;background:var(--bg)}
+body{font-family:var(--serif);color:var(--text);height:100%;overflow:hidden;-webkit-text-size-adjust:100%}
+
+/* ── CONTEXT SCREEN ── */
+#context{
+  position:fixed;inset:0;background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:40px 24px 40px;z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transition:opacity 0.6s ease;
+}
+@media(min-height:700px){
+  #context{justify-content:center;padding:32px 24px;}
+}
+.ctx-wrap{max-width:480px;width:100%}
+.ctx-source{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:16px}
+.ctx-headline{font-size:clamp(15px,4vw,19px);font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px}
+.ctx-dateline{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.ctx-body{font-size:clamp(13px,3.5vw,15px);line-height:1.85;color:var(--text2);margin-bottom:14px}
+.ctx-body strong{color:var(--text);font-weight:700}
+.ctx-redacted{display:inline-block;background:var(--text3);color:transparent;border-radius:1px;padding:0 2px}
+.ctx-continue{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text3);padding:12px 20px;cursor:pointer;margin-top:12px;
+  -webkit-tap-highlight-color:transparent;min-height:48px;display:block;width:100%;
+}
+.ctx-continue:active{border-color:var(--accent2);color:var(--text2)}
 
 /* ── SPLASH ── */
 #splash{
   position:fixed;inset:0;background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:24px;padding:40px;text-align:center;z-index:100;
+  gap:20px;padding:32px 24px;text-align:center;z-index:100;
   transition:opacity 0.8s ease;
 }
 .splash-logo{
-  font-family:var(--mono);font-size:clamp(18px,3vw,28px);
-  letter-spacing:6px;color:var(--accent);
-  border:1px solid var(--accent2);
-  padding:20px 36px;
-  position:relative;
+  font-family:var(--mono);font-size:clamp(14px,4vw,26px);
+  letter-spacing:clamp(3px,1vw,6px);color:var(--accent);
+  border:1px solid var(--accent2);padding:16px 24px;position:relative;
 }
 .splash-logo::before,.splash-logo::after{
-  content:'';position:absolute;width:8px;height:8px;
-  border:1px solid var(--accent2);
+  content:'';position:absolute;width:8px;height:8px;border:1px solid var(--accent2);
 }
 .splash-logo::before{top:-4px;left:-4px;border-right:none;border-bottom:none}
 .splash-logo::after{bottom:-4px;right:-4px;border-left:none;border-top:none}
-.splash-corp{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--text3)}
-.splash-flavor{font-size:15px;font-style:italic;color:var(--text2);max-width:400px;line-height:1.8}
+.splash-corp{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3)}
+.splash-flavor{font-size:clamp(13px,3.5vw,15px);font-style:italic;color:var(--text2);max-width:360px;line-height:1.8}
 .splash-start{
   font-family:var(--mono);font-size:12px;letter-spacing:3px;
   background:transparent;border:1px solid var(--accent2);
-  color:var(--accent);padding:12px 28px;cursor:pointer;
-  transition:all 0.2s;margin-top:8px;
+  color:var(--accent);padding:14px 28px;cursor:pointer;
+  transition:all 0.2s;margin-top:4px;-webkit-tap-highlight-color:transparent;
+  min-height:48px;
 }
-.splash-start:hover{background:var(--bg3);border-color:var(--accent)}
-.splash-divider{width:60px;height:1px;background:var(--border2)}
+.splash-start:active{background:var(--bg3);border-color:var(--accent)}
+.splash-divider{width:50px;height:1px;background:var(--border2)}
 
 /* ── GAME LAYOUT ── */
-#game{display:none;height:100vh;flex-direction:column}
+#game{display:none;height:100%;height:100dvh;flex-direction:column}
 .topbar{
   display:flex;justify-content:space-between;align-items:center;
-  padding:8px 20px;background:var(--bg2);
-  border-bottom:1px solid var(--border);flex-shrink:0;
+  padding:7px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;
 }
-.topbar-left{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3)}
-.topbar-act{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--accent2)}
-.topbar-right{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.topbar-left{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--text3);white-space:nowrap}
+.topbar-act{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--accent2);text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-right{display:none}
 
+/* ── STATUS BAR (móvil, reemplaza sidebar) ── */
+.status-bar{
+  display:flex;align-items:center;gap:0;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  flex-shrink:0;overflow:hidden;
+}
+.status-toggle{
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--text3);
+  padding:8px 12px;cursor:pointer;border-right:1px solid var(--border);
+  flex-shrink:0;background:transparent;border-top:none;border-bottom:none;border-left:none;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.status-flags{
+  display:flex;align-items:center;gap:10px;padding:0 12px;flex:1;overflow:hidden;
+}
+.flag-pip{
+  display:flex;align-items:center;gap:4px;
+  font-family:var(--mono);font-size:8px;color:var(--text3);white-space:nowrap;
+}
+.flag-pip .dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.flag-pip.active{color:var(--text2)}
+.flag-pip.active .dot{background:var(--accent)}
+.progress-mini{
+  width:40px;height:2px;background:var(--border);flex-shrink:0;margin-right:12px;
+}
+.progress-mini-fill{height:100%;background:var(--accent2);transition:width 0.5s}
+
+/* ── DRAWER (inventario + flags expandido) ── */
+.drawer{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  flex-shrink:0;overflow:hidden;max-height:0;
+  transition:max-height 0.3s ease;
+}
+.drawer.open{max-height:200px}
+.drawer-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  padding:12px 14px;
+}
+.drawer-col-title{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--text3);margin-bottom:8px;
+}
+.drawer-inv{font-size:11px;color:var(--text2);line-height:1.8}
+.drawer-flags{display:flex;flex-direction:column;gap:4px}
+.drawer-flag{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+}
+.drawer-flag .dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.drawer-flag.active{color:var(--text2)}
+.drawer-flag.active .dot{background:var(--accent)}
+.drawer-divider{
+  grid-column:1/-1;height:1px;background:var(--border);margin:8px 0;
+}
+
+/* ── MAIN ── */
 .main{display:flex;flex:1;min-height:0}
+.narrative-panel{flex:1;display:flex;flex-direction:column;min-width:0}
 
-/* ── NARRATIVE PANEL ── */
-.narrative-panel{
-  flex:1;display:flex;flex-direction:column;min-width:0;
-  border-right:1px solid var(--border);
-}
 .location-bar{
-  padding:8px 20px;background:var(--bg2);
+  padding:7px 16px;background:var(--bg2);
   border-bottom:1px solid var(--border);flex-shrink:0;
-  font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:1px;
-  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:9px;color:var(--text2);letter-spacing:1px;
+  display:flex;align-items:center;gap:7px;
 }
-.location-dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.location-dot{width:4px;height:4px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+#location-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 .text-area{
-  flex:1;overflow-y:auto;padding:28px 32px;
-  scroll-behavior:smooth;
+  flex:1;overflow-y:auto;padding:20px 18px;
+  scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
 }
-.text-area::-webkit-scrollbar{width:3px}
-.text-area::-webkit-scrollbar-track{background:var(--bg)}
+.text-area::-webkit-scrollbar{width:2px}
 .text-area::-webkit-scrollbar-thumb{background:var(--border2)}
 
-.narrative-para{
-  font-size:16px;line-height:1.85;color:var(--text);
-  margin-bottom:18px;
-  opacity:0;transform:translateY(6px);
-  animation:fadeup 0.4s ease forwards;
-}
-.narrative-quote{
-  font-style:italic;
-  border-left:2px solid var(--accent2);
-  padding-left:16px;
-  color:var(--text2);
-  margin:16px 0;
-  opacity:0;transform:translateY(6px);
-  animation:fadeup 0.4s ease forwards;
-}
-.narrative-sys{
-  font-family:var(--mono);font-size:11px;color:var(--text3);
-  margin:12px 0;letter-spacing:0.5px;
-  opacity:0;transform:translateY(6px);
-  animation:fadeup 0.4s ease forwards;
-}
 .act-header{
-  font-family:var(--mono);font-size:10px;letter-spacing:3px;
-  color:var(--accent2);margin-bottom:20px;padding-bottom:12px;
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;
+  color:var(--accent2);margin-bottom:16px;padding-bottom:10px;
   border-bottom:1px solid var(--border);
   opacity:0;animation:fadeup 0.3s ease forwards;
+}
+.narrative-para{
+  font-size:clamp(15px,4vw,17px);line-height:1.85;color:var(--text);
+  margin-bottom:16px;
+  opacity:0;transform:translateY(6px);animation:fadeup 0.4s ease forwards;
+}
+.narrative-quote{
+  font-style:italic;border-left:2px solid var(--accent2);
+  padding-left:14px;color:var(--text2);margin:14px 0;
+  opacity:0;transform:translateY(6px);animation:fadeup 0.4s ease forwards;
 }
 @keyframes fadeup{to{opacity:1;transform:translateY(0)}}
 
 /* ── CHOICES ── */
 .choices-area{
-  padding:16px 32px 20px;border-top:1px solid var(--border);
+  padding:12px 16px 16px;border-top:1px solid var(--border);
   flex-shrink:0;background:var(--bg2);
 }
 .choices-label{
   font-family:var(--mono);font-size:9px;letter-spacing:2px;
-  color:var(--text3);margin-bottom:12px;
+  color:var(--text3);margin-bottom:10px;
 }
 .choice-btn{
   display:block;width:100%;text-align:left;
   background:transparent;border:1px solid var(--border);
-  color:var(--text2);font-family:var(--serif);font-size:14px;
-  padding:10px 14px;margin-bottom:7px;cursor:pointer;
-  transition:all 0.15s;line-height:1.5;
-  position:relative;
+  color:var(--text2);font-family:var(--serif);
+  font-size:clamp(13px,3.8vw,15px);
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;
+  line-height:1.5;position:relative;
+  -webkit-tap-highlight-color:transparent;
+  min-height:48px;
 }
 .choice-btn::before{
   content:attr(data-n);
-  font-family:var(--mono);font-size:10px;color:var(--text3);
-  margin-right:10px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);margin-right:8px;
 }
-.choice-btn:hover{
-  border-color:var(--accent2);color:var(--text);background:var(--bg3);
-}
-.choice-btn:hover::before{color:var(--accent)}
+.choice-btn:active{border-color:var(--accent2);color:var(--text);background:var(--bg3)}
 .choice-btn:last-child{margin-bottom:0}
-.choice-btn.locked{opacity:0.3;cursor:not-allowed;pointer-events:none}
+.choice-btn.locked{opacity:0.3;pointer-events:none}
 .choice-btn.locked::after{
   content:' [requiere compasión]';
   font-family:var(--mono);font-size:9px;color:var(--text3);
 }
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:200px;flex-shrink:0;display:flex;flex-direction:column;
-  overflow-y:auto;background:var(--bg2);
-}
-.sidebar::-webkit-scrollbar{width:2px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
-
-.sidebar-section{
-  padding:14px 14px 12px;
-  border-bottom:1px solid var(--border);
-}
-.sidebar-title{
-  font-family:var(--mono);font-size:9px;letter-spacing:2px;
-  color:var(--text3);margin-bottom:10px;
-}
-.inv-item{
-  font-size:11px;color:var(--text2);
-  padding:4px 0;border-bottom:1px solid var(--border);
-  line-height:1.4;
-}
-.inv-item:last-child{border:none}
-.inv-empty{font-size:11px;color:var(--text3);font-style:italic}
-
-.flag-item{
-  display:flex;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:10px;color:var(--text3);
-  padding:3px 0;
-}
-.flag-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
-.flag-dot.active{background:var(--accent)}
-.flag-item.active{color:var(--text2)}
-
-.progress-section{padding:14px}
-.progress-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px}
-.progress-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden}
-.progress-fill{height:100%;background:var(--accent2);transition:width 0.5s ease}
-
 /* ── ENDING ── */
-.ending-wrap{
-  flex:1;overflow-y:auto;padding:40px 32px;
-}
-.ending-wrap::-webkit-scrollbar{width:3px}
-.ending-wrap::-webkit-scrollbar-thumb{background:var(--border2)}
-.ending-title{
-  font-family:var(--mono);font-size:11px;letter-spacing:3px;
-  color:var(--accent);margin-bottom:4px;
-}
-.ending-subtitle{
-  font-style:italic;font-size:13px;color:var(--text3);
-  margin-bottom:32px;padding-bottom:20px;
-  border-bottom:1px solid var(--border);
-}
-.ending-para{
-  font-size:16px;line-height:1.9;margin-bottom:18px;color:var(--text);
-  opacity:0;animation:fadeup 0.5s ease forwards;
-}
-.ending-divider{
-  text-align:center;color:var(--text3);font-family:var(--mono);
-  font-size:11px;margin:20px 0;letter-spacing:3px;
-}
+.ending-wrap{flex:1;overflow-y:auto;padding:24px 18px;-webkit-overflow-scrolling:touch}
+.ending-title{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.ending-subtitle{font-style:italic;font-size:13px;color:var(--text3);margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.ending-para{font-size:clamp(15px,4vw,17px);line-height:1.9;margin-bottom:16px;color:var(--text);opacity:0;animation:fadeup 0.5s ease forwards}
+.ending-divider{text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px;margin:18px 0;letter-spacing:3px}
 .restart-btn{
   font-family:var(--mono);font-size:11px;letter-spacing:2px;
   background:transparent;border:1px solid var(--border2);
-  color:var(--text3);padding:10px 20px;cursor:pointer;
-  transition:all 0.2s;margin-top:20px;display:inline-block;
+  color:var(--text3);padding:14px 20px;cursor:pointer;
+  margin-top:24px;display:inline-block;min-height:48px;
+  -webkit-tap-highlight-color:transparent;
 }
-.restart-btn:hover{border-color:var(--accent2);color:var(--text2)}
+.restart-btn:active{border-color:var(--accent2);color:var(--text2)}
 
-/* ── TRANSITION OVERLAY ── */
+/* ocultar sidebar desktop en móvil */
+.sidebar-desktop{display:none}
+
+/* ── DESKTOP (≥640px) ── */
+@media(min-width:640px){
+  .status-bar{display:none}
+  .drawer{display:none}
+  .topbar-right{display:block}
+  .main{flex-direction:row}
+  .narrative-panel{border-right:1px solid var(--border)}
+  .sidebar-desktop{display:flex;
+    width:190px;flex-shrink:0;display:flex;flex-direction:column;
+    overflow-y:auto;background:var(--bg2);
+  }
+  .sidebar-desktop::-webkit-scrollbar{width:2px}
+  .sidebar-desktop::-webkit-scrollbar-thumb{background:var(--border2)}
+  .sd-section{padding:13px 13px 11px;border-bottom:1px solid var(--border)}
+  .sd-title{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);margin-bottom:9px}
+  .sd-inv-item{font-size:11px;color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border);line-height:1.4}
+  .sd-inv-item:last-child{border:none}
+  .sd-inv-empty{font-size:11px;color:var(--text3);font-style:italic}
+  .sd-flag{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text3);padding:3px 0}
+  .sd-flag .dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
+  .sd-flag.active{color:var(--text2)}
+  .sd-flag.active .dot{background:var(--accent)}
+  .sd-prog{padding:13px}
+  .sd-prog-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px}
+  .sd-prog-bar{height:2px;background:var(--border);overflow:hidden}
+  .sd-prog-fill{height:100%;background:var(--accent2);transition:width 0.5s}
+  .text-area{padding:24px 28px}
+  .choices-area{padding:14px 28px 18px}
+  .narrative-para,.ending-para{font-size:16px}
+  .choice-btn{font-size:14px;padding:10px 14px}
+}
+
+/* ── TRANSITION ── */
 #transition{
   position:fixed;inset:0;background:var(--bg);
-  opacity:0;pointer-events:none;z-index:50;
-  transition:opacity 0.35s ease;
+  opacity:0;pointer-events:none;z-index:50;transition:opacity 0.3s ease;
 }
 #transition.active{opacity:1;pointer-events:all}
 </style>
 </head>
-<body>
+<body onload="showContext()">
 
 <div id="transition"></div>
+
+<!-- CONTEXT -->
+<div id="context">
+  <div class="ctx-wrap">
+    <div class="ctx-source">EL MERIDIANO LIBRE // PRENSA INDEPENDIENTE DIGITALIZADA — ARCHIVO 2041</div>
+    <div class="ctx-headline">HUMAN CHAIN REPORTA 847 "NEUTRALIZACIONES" EN EL ÚLTIMO TRIMESTRE MIENTRAS CRECE LA PRESIÓN SOBRE LAS CIUDADES AMURALLADAS</div>
+    <div class="ctx-dateline">CARSO, 14 DE MARZO DE 2041 — REDACCIÓN CENTRAL</div>
+    <p class="ctx-body">Hace doce años, las primeras criaturas emergieron de zonas costeras e industriales abandonadas. Nadie supo explicar el origen. El gobierno declaró estado de contención biológica. Human Chain Corporation obtuvo el contrato exclusivo de erradicación tres semanas después.</p>
+    <p class="ctx-body">Hoy, las ciudades amuralladas albergan al <strong>31% de la población superviviente</strong>. Las fosas perimetrales —rellenas con agente ácido renovable— son la única frontera entre la vida conocida y lo que los manuales oficiales llaman <em>"fauna mutante de origen indeterminado, sin capacidad cognitiva superior"</em>.</p>
+    <p class="ctx-body">Las criaturas —denominadas popularmente <strong>"las Extintas"</strong>, aunque el origen del apodo nadie lo reivindica— se regeneran si no son destruidas completamente. El fuego o el ácido concentrado son los únicos métodos certificados. Human Chain emplea actualmente a más de <strong>40.000 operativos de campo</strong>.</p>
+    <p class="ctx-body">Fuentes anónimas dentro del Cuerpo de Erradicación señalan un aumento en deserciones y en lo que llaman <em>"incidentes de desobediencia por contacto prolongado"</em>. Human Chain no respondió a las consultas de este medio. El periodista que publicó la primera versión de esta nota fue declarado <span class="ctx-redacted">desaparecido voluntario</span> por las autoridades de Carso Central.</p>
+    <p class="ctx-body" style="font-style:italic;color:var(--text3);font-size:12px;">Este archivo fue recuperado de servidores encriptados. Su autenticidad no ha sido verificada por ninguna institución oficial.</p>
+    <button class="ctx-continue" onclick="showSplash()">[ CONTINUAR ]</button>
+  </div>
+</div>
 
 <!-- SPLASH -->
 <div id="splash">
@@ -247,10 +297,40 @@ body{font-family:var(--serif);color:var(--text);overflow:hidden}
 <!-- GAME -->
 <div id="game">
   <div class="topbar">
-    <div class="topbar-left" id="tb-corp">HUMAN CHAIN CORP. // CAMPO</div>
+    <div class="topbar-left">HC // CAMPO</div>
     <div class="topbar-act" id="tb-act"></div>
     <div class="topbar-right" id="tb-node"></div>
   </div>
+
+  <!-- MÓVIL: barra de estado colapsable -->
+  <div class="status-bar">
+    <button class="status-toggle" onclick="toggleDrawer()">≡ INFO</button>
+    <div class="status-flags">
+      <div class="flag-pip" id="pip-compasion"><span class="dot"></span>comp.</div>
+      <div class="flag-pip" id="pip-curiosidad"><span class="dot"></span>curio.</div>
+      <div class="flag-pip" id="pip-violencia"><span class="dot"></span>viol.</div>
+      <div class="flag-pip" id="pip-lealtad"><span class="dot"></span>leal.</div>
+    </div>
+    <div class="progress-mini"><div class="progress-mini-fill" id="prog-mini" style="width:0%"></div></div>
+  </div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-inner">
+      <div>
+        <div class="drawer-col-title">INVENTARIO</div>
+        <div class="drawer-inv" id="drawer-inv">—</div>
+      </div>
+      <div>
+        <div class="drawer-col-title">DECISIONES</div>
+        <div class="drawer-flags">
+          <div class="drawer-flag" id="df-compasion"><span class="dot"></span>compasión</div>
+          <div class="drawer-flag" id="df-curiosidad"><span class="dot"></span>curiosidad</div>
+          <div class="drawer-flag" id="df-violencia"><span class="dot"></span>violencia</div>
+          <div class="drawer-flag" id="df-lealtad"><span class="dot"></span>lealtad</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="main">
     <div class="narrative-panel" id="narrative-panel">
       <div class="location-bar">
@@ -260,29 +340,23 @@ body{font-family:var(--serif);color:var(--text);overflow:hidden}
       <div class="text-area" id="text-area"></div>
       <div class="choices-area" id="choices-area"></div>
     </div>
-    <div class="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-title">INVENTARIO</div>
-        <div id="inv-list"><span class="inv-empty">vacío</span></div>
+
+    <!-- DESKTOP: sidebar clásico -->
+    <div class="sidebar-desktop">
+      <div class="sd-section">
+        <div class="sd-title">INVENTARIO</div>
+        <div id="sd-inv"><span class="sd-inv-empty">vacío</span></div>
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-title">DECISIONES</div>
-        <div class="flag-item" id="flag-compasion">
-          <div class="flag-dot" id="fdot-compasion"></div>compasión
-        </div>
-        <div class="flag-item" id="flag-curiosidad">
-          <div class="flag-dot" id="fdot-curiosidad"></div>curiosidad
-        </div>
-        <div class="flag-item" id="flag-violencia">
-          <div class="flag-dot" id="fdot-violencia"></div>violencia
-        </div>
-        <div class="flag-item" id="flag-lealtad">
-          <div class="flag-dot" id="fdot-lealtad"></div>lealtad
-        </div>
+      <div class="sd-section">
+        <div class="sd-title">DECISIONES</div>
+        <div class="sd-flag" id="sdf-compasion"><span class="dot"></span>compasión</div>
+        <div class="sd-flag" id="sdf-curiosidad"><span class="dot"></span>curiosidad</div>
+        <div class="sd-flag" id="sdf-violencia"><span class="dot"></span>violencia</div>
+        <div class="sd-flag" id="sdf-lealtad"><span class="dot"></span>lealtad</div>
       </div>
-      <div class="progress-section">
-        <div class="progress-label">PROGRESO</div>
-        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="sd-prog">
+        <div class="sd-prog-label">PROGRESO</div>
+        <div class="sd-prog-bar"><div class="sd-prog-fill" id="prog-fill" style="width:0%"></div></div>
       </div>
     </div>
   </div>
@@ -355,19 +429,19 @@ const STORY = {
     choices:[{text:'Ir al briefing final',next:'act1_partida'}]},
 
   prologue_companero:{id:'prologue_companero',act:'PRÓLOGO',location:'Barracas',
-    text:['El que está más cerca se llama Mira. Parche #22 en el hombro: veintidós operativos.',
+    text:['El que está más cerca se llama Mirai. Parche #22 en el hombro: veintidós operativos.',
     '"Primera salida", te dice. No es una pregunta.',
     '"Las fase 1 y 2 son fáciles. Las fase 3 ya duele verlas porque se parecen a algo que reconocés pero no podés nombrar. Las fase 4..." Se detiene.',
     '"¿Las fase 4?"',
     '"Rezá para no encontrar una fase 4. No porque sean más peligrosas. Sino porque si encontrás una vas a tener que tomar una decisión y después vivir con ella."',
-    'Mira se da vuelta y cierra los ojos.'],
+    'Mirai se da vuelta y cierra los ojos.'],
     choices:[
       {text:'Preguntarle qué decisión',next:'prologue_decision_pregunta'},
       {text:'Dejarla descansar',next:'act1_partida'}
     ]},
 
   prologue_decision_pregunta:{id:'prologue_decision_pregunta',act:'PRÓLOGO',location:'Barracas',
-    text:['Mira abre un ojo.',
+    text:['Mirai abre un ojo.',
     '"Si seguís o si parás."',
     '"¿Seguir haciendo qué?"',
     'El ojo se cierra de nuevo.',
@@ -382,12 +456,15 @@ const STORY = {
     'La imagen del agua tarda en irse.'],
     choices:[{text:'Levantarse y prepararse',next:'act1_partida'}]},
 
-  act1_partida:{id:'act1_partida',act:'ACTO I — LA EMBOSCADA',location:'Sector Frontera 9 // 06:40 AM',
-    text:['El transporte huele a combustible y a algo más que preferís no identificar.',
-    'Son doce en el batallón. El líder de campo es Cassov, que habla poco y camina delante siempre.',
-    'Objetivo: madriguera estimada de veinte a treinta unidades, mayoría fase 1 y 2. Terreno abierto.',
-    'Kael: flanco derecho con otros tres. Protocolo claro: fuego primero, ácido para completar, documentar cada baja.',
-    'Diez minutos que se sienten como mucho menos.'],
+  act1_partida:{id:'act1_partida',act:'ACTO I — LA EMBOSCADA',location:'Transporte HC-7 // En ruta al Sector 9',
+    text:['El camión de Human Chain sale de Carso a las 5:50 AM. Doce operativos apretados en dos bancos de metal frente a frente. El olor es una mezcla de combustible, ácido concentrado en los tanques de carga y algo más orgánico que nadie menciona.',
+    'Nadie habla durante los primeros veinte minutos. Mirai —parche #22, la más veterana del grupo— tiene los ojos cerrados pero no duerme. Lo sabés porque cada tanto aprieta la mandíbula.',
+    'El operativo del parche #31 limpia su lanzallamas por tercera vez desde que salieron. Otro, cuyo nombre nunca te dicen, mira por la ventanilla con una expresión que reconocés: es la de alguien contando los kilómetros que lo separan de algo que no quiere ver.',
+    'Cassov, la líder de campo, ocupa el asiento del copiloto. Antes de subir entregó los últimos briefings: madriguera estimada de veinte a treinta unidades en una planta de tratamiento abandonada. Mayoría fase 1 y 2. Zona clasificada como tranquila.',
+    'Esa palabra, tranquila, flotó en el silencio del camión durante un rato.',
+    'El vehículo frena. Cassov baja primero.',
+    '"Kael. Flanco derecho con Voss y Deren. Protocolo estándar."',
+    'Es la primera vez que alguien dice tu nombre en voz alta hoy.'],
     choices:[
       {text:'Revisar el perímetro antes de la orden',next:'act1_perimetro',flag:'curiosidad'},
       {text:'Mantener posición y esperar',next:'act1_espera'},
@@ -395,7 +472,7 @@ const STORY = {
     ]},
 
   act1_perimetro:{id:'act1_perimetro',act:'ACTO I — LA EMBOSCADA',location:'Perímetro norte',
-    text:['A doscientos metros del punto de entrada, el suelo cambia de algo difícil de nombrar.',
+    text:['A doscientos metros del punto de entrada el suelo cambia. No de textura. De algo más difícil de nombrar, como si el terreno cargara una historia reciente que no querés leer.',
     'Marcas circulares en la tierra. Perfectamente regulares.',
     'Más allá: tres criaturas fase 2 en cuclillas, quietas, mirando hacia el interior de la planta.',
     'No hacia vos. Adentro. Como si vigilaran algo.',
@@ -429,7 +506,7 @@ const STORY = {
     choices:[{text:'Avanzar con el batallón',next:'act1_avance'}]},
 
   act1_espera:{id:'act1_espera',act:'ACTO I — LA EMBOSCADA',location:'Punto de concentración',
-    text:['Esperás. Mira está a tu izquierda mirando el horizonte con una expresión que no es miedo exactamente.',
+    text:['Esperás. Mirai está a tu izquierda, mirando el horizonte con una expresión que no es exactamente miedo.',
     'La orden llega. Avance en formación delta.',
     'La planta se ve abandonada desde afuera. Ventanas rotas, óxido, silencio.',
     'Cassov levanta el puño. Parada.',
@@ -437,12 +514,14 @@ const STORY = {
     choices:[{text:'Avanzar',next:'act1_avance'}]},
 
   act1_cassov:{id:'act1_cassov',act:'ACTO I — LA EMBOSCADA',location:'Punto de concentración',
-    text:['"¿Cuántas salidas tiene la planta?"',
-    'Cassov te mira. No era una pregunta que esperaba de un novato.',
-    '"Cuatro confirmadas. Dos probables no mapeadas."',
-    '"¿Y si hay más unidades que las estimadas?"',
-    '"Entonces protocolo es retirada ordenada y refuerzos. No ser héroe." Te sostiene la mirada. "¿Entendido?"',
-    'Algo en esa conversación sentís que fue importante.'],
+    text:['Cassov revisa el mapa de campo cuando te acercás.',
+    '"¿Cuántas salidas tiene la planta?" le preguntás.',
+    'Te mira. No era la pregunta que esperaba de un novato en su primera salida.',
+    '"Cuatro confirmadas. Dos probables sin mapear."',
+    '"¿Y si hay más unidades de las estimadas?"',
+    'Una pausa corta. Cassov dobla el mapa.',
+    '"Entonces el protocolo es retirada ordenada y solicitud de refuerzos. No ser héroe." Te sostiene la mirada un momento. "¿Entendido, Kael?"',
+    'Asentís. Algo en ese intercambio —en el hecho de que te respondió en serio— lo guardás.'],
     choices:[{text:'Avanzar con el batallón',next:'act1_avance'}]},
 
   act1_avance:{id:'act1_avance',act:'ACTO I — LA EMBOSCADA',location:'Interior — Planta de tratamiento',
@@ -503,12 +582,12 @@ const STORY = {
     choices:[{text:'Continuar',next:'act1_aftermath'}]},
 
   act1_aftermath:{id:'act1_aftermath',act:'ACTO I — LA EMBOSCADA',location:'Campo abierto // Tarde',
-    text:['De doce, quedaron tres afuera. Vos, Mira —quemaduras en el brazo, callada— y el parche #31.',
+    text:['De doce, quedaron tres afuera. Vos, Mirai —quemaduras en el brazo izquierdo, callada desde que salió de la planta— y el operativo del parche #31.',
     'La radio sin señal. El transporte no está.',
     'La base más cercana: cuarenta kilómetros al norte. Zona no controlada.',
     '"Podemos esperar rescate o podemos empezar a caminar."',
     'El 31: "Si hay rescate, ya estaría acá."',
-    'Mira no responde. Eso es una respuesta.'],
+    'Mirai no responde. Eso es una respuesta.'],
     choices:[
       {text:'Empezar a caminar ahora, antes de que anochezca',next:'act2_inicio_marcha'},
       {text:'Esperar hasta el amanecer',next:'act2_espera_noche'}
@@ -528,7 +607,7 @@ const STORY = {
   act2_espera_noche:{id:'act2_espera_noche',act:'ACTO II — EL CAMINO',location:'Refugio provisional // Noche',
     text:['Se esconden en hormigón semi-derrumbado. Turnos de guardia de dos horas.',
     'En tu turno, a las 2 AM: movimiento afuera. Cuatro criaturas fase 3. Sentadas. En círculo.',
-    'No cazan. No duermen.',
+    'No cazan. No duermen. Están haciendo otra cosa para la que no tenés nombre.',
     'Una emite un sonido bajo, sostenido. Las otras lo replican, una por una, hasta que el sonido se vuelve: conjunto.',
     'Siguen así cuarenta minutos. Después se van.',
     'Cuando amanece, marchán. No decís nada sobre lo que viste.'],
@@ -539,14 +618,14 @@ const STORY = {
     text:['El disparo de ácido es limpio.',
     'Debajo: algo pequeño, envuelto en material orgánico. Una cría. Viva.',
     'El 31 ya levantó el arma.',
-    'Mira dice: "Protocolo."'],
+    'Mirai dice: "Protocolo."'],
     choices:[
       {text:'Seguir el protocolo',next:'act2_protocolo_cria',flag:'violencia'},
       {text:'Negarte a completar',next:'act2_niega_cria',flag:'compasion'}
     ]},
 
   act2_protocolo_cria:{id:'act2_protocolo_cria',act:'ACTO II — EL CAMINO',location:'Ruta norte',
-    text:['El 31 completa la eliminación. Mira documenta. Vos mirás hacia el camino.',
+    text:['El 31 completa la eliminación. Mirai documenta en silencio. Vos mirás hacia el camino.',
     'Ninguno dice nada.',
     'Seguís marchando.'],
     choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
@@ -555,7 +634,7 @@ const STORY = {
     text:['"No."',
     'El 31 te mira. "Es protocolo."',
     '"Lo sé."',
-    'Mira baja el arma del 31 con la mano. Lentamente.',
+    'Mirai baja el arma del 31 con la mano. Lentamente.',
     '"Seguimos."',
     'La cría queda atrás. A un kilómetro el 31 dice, en voz baja: "¿Cuántas veces ya hicimos esto?"',
     'Nadie responde. Pero algo cambió.'],
@@ -578,7 +657,7 @@ const STORY = {
     text:['Te ponés en el medio.',
     'El 31 baja el arma de sorpresa.',
     'La criatura fase 2 no te ataca. La cría se mueve debajo.',
-    'Mira: "No podemos quedarnos acá." "Lo sé." Te corrés despacio. "Seguimos."',
+    'Mirai: "No podemos quedarnos acá." "Lo sé." Te corrés despacio. "Seguimos."',
     'El 31 mira la criatura. La criatura lo mira a él. Después el 31 baja el arma completamente y sigue caminando.',
     'No dice nada en el resto del día.'],
     choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
@@ -588,7 +667,7 @@ const STORY = {
     'Treinta segundos de registro. La criatura no se mueve.',
     '"Listo. Seguimos."',
     'El 31: "Eso debería estar en algún informe."',
-    'Mira: "Lo estará." Ninguno suena convencido.'],
+    'Mirai: "Lo estará." Ninguno suena convencido.'],
     inventory:['Registro — comportamiento fase 2'],
     flag:'curiosidad',
     choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
@@ -596,17 +675,19 @@ const STORY = {
   act2_rodea_sola:{id:'act2_rodea_sola',act:'ACTO II — EL CAMINO',location:'Ruta norte',
     text:['Rodean. La criatura no los sigue.',
     'El 31: "¿Qué tenía?"',
-    'Mira: "Una cría."',
+    'Mirai: "Una cría."',
     '"¿Cómo sabés?"',
     '"Porque las vi antes. Muchas veces."',
     'Nadie dice más.'],
     choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
 
   act2_marcha_dia:{id:'act2_marcha_dia',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 18 — Mediodía',
-    text:['A mitad del camino: restos de otro batallón. Más antiguo. Logo viejo de Human Chain, la mano con cadena cortada.',
-    'Sin cuerpos. Solo equipo, vehículos volcados, marcas de combate.',
-    'Pintado en el asfalto con ácido de equipo: dos palabras.',
-    '"NO SON."'],
+    text:['A mitad del camino los tres se detienen casi al mismo tiempo, sin que nadie lo ordene.',
+    'Son los restos de otro batallón. Más antiguo: los uniformes tienen el logo viejo de Human Chain, la mano con la cadena cortada. Anterior a la militarización.',
+    'Sin cuerpos. Solo equipo abandonado, dos vehículos volcados, marcas de combate en el asfalto y en las paredes de lo que fue una parada de ruta.',
+    'Y algo más. Alguien usó ácido de campo para escribir en el suelo. Las letras tienen treinta centímetros de alto.',
+    '"NO SON."',
+    'Dos palabras. Sin punto. Como si quien las escribió se hubiera interrumpido, o hubiera decidido que no hacía falta terminar la oración.'],
     choices:[
       {text:'Buscar contexto en los restos',next:'act2_restos_batallon',flag:'curiosidad'},
       {text:'Documentar y seguir',next:'act2_sigue_sin_investigar'},
@@ -626,13 +707,13 @@ const STORY = {
 
   act2_sigue_sin_investigar:{id:'act2_sigue_sin_investigar',act:'ACTO II — EL CAMINO',location:'Ruta norte',
     text:['Marchán. Las dos palabras quedan atrás.',
-    'Mira y el 31 miraron la inscripción más tiempo del necesario para leerla.'],
+    'Mirai y el 31 miraron la inscripción más tiempo del necesario para leerla.'],
     choices:[{text:'Continuar',next:'act2_ultimo_tramo'}]},
 
   act2_descarta_mensaje:{id:'act2_descarta_mensaje',act:'ACTO II — EL CAMINO',location:'Ruta norte',
     text:['El 31 asiente. Propaganda.',
-    'Mira no dice nada.',
-    'A doscientos metros Mira dice: "Las primeras células humanas también eran solo organismos que querían sobrevivir."',
+    'Mirai no dice nada.',
+    'A doscientos metros Mirai dice: "Las primeras células humanas también eran solo organismos que querían sobrevivir."',
     'El 31: "Eso es diferente."',
     '"¿Por qué?"',
     'El 31 no responde.'],
@@ -640,11 +721,11 @@ const STORY = {
 
   act2_ultimo_tramo:{id:'act2_ultimo_tramo',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 35 — Tarde',
     text:['A cinco kilómetros de la base, el viento trae olor a quemado.',
-    'Mira para en seco.',
-    'Donde debería estar la base, hay humo negro, espeso, del tipo que significa que algo que no debería arder está ardiendo.',
-    '"Puede ser un ejercicio", dice el 31.',
-    'Mira no responde. Vos tampoco.',
-    'El olor no es de ejercicio.'],
+    'Mirai se detiene en seco. No dice nada. Solo señala el horizonte con un gesto corto.',
+    'Donde debería estar la base hay humo negro y espeso, del tipo que significa que algo que no debería arder lleva horas ardiendo.',
+    '"Puede ser un ejercicio de campo", dice el 31, aunque su voz no convence ni al que la emite.',
+    'Mirai no responde. Vos tampoco.',
+    'Seguís caminando. El olor no es de ejercicio.'],
     choices:[
       {text:'Acercarse rápido, pueden necesitar ayuda',next:'act3_llegada_rapida'},
       {text:'Acercarse con cautela, evaluar primero',next:'act3_llegada_cautelosa',flag:'curiosidad'}
@@ -655,7 +736,7 @@ const STORY = {
     'Silencio adentro. Y daño.',
     'Los edificios de barracas destruidos desde adentro, no desde afuera.',
     'El 31 revisa el primer cuerpo. Uniforme Human Chain. Sin mordedura, sin ataque de extintas.',
-    'Mira: "Esto no lo hicieron ellas."',
+    'Mirai: "Esto no lo hicieron ellas."',
     'Movimiento en el edificio de administración.'],
     choices:[
       {text:'Ir hacia el movimiento',next:'act3_movimiento_admin'},
@@ -664,7 +745,7 @@ const STORY = {
 
   act3_llegada_cautelosa:{id:'act3_llegada_cautelosa',act:'ACTO III — LA BASE',location:'Perímetro exterior',
     text:['Diez minutos de observación. Sin movimiento de extintas. Sin movimiento humano.',
-    'Señal de radio en frecuencia de emergencia. Morse. Mira descifra:',
+    'Señal de radio en frecuencia de emergencia. Morse. Mirai descifra:',
     '"Dice: archivo. Solo eso, repetido."',
     'Entran por el acceso lateral, sin daño visible.'],
     choices:[
@@ -675,7 +756,7 @@ const STORY = {
   act3_busca_señal:{id:'act3_busca_señal',act:'ACTO III — LA BASE',location:'Sala de comunicaciones',
     text:['La señal viene del subsuelo. Un técnico herido en la pierna, escondido bajo una consola. Fen.',
     '"El archivo del nivel 3. Tienen que llegar ahí."',
-    'Se detiene. Mira al 31: "¿Cuánto tiempo en Human Chain?"',
+    'Se detiene. Le habla al 31: "¿Cuánto tiempo en Human Chain?"',
     '"Dieciocho meses."',
     '"¿Leyeron alguna vez el Informe Abismo?"',
     'Nadie responde.',
@@ -688,7 +769,7 @@ const STORY = {
   act3_fen_completo:{id:'act3_fen_completo',act:'ACTO III — LA BASE',location:'Sala de comunicaciones',
     text:['"Lo sacaron de una fosa oceánica en el Atlántico sur. Hace doce años. Un ARN mensajero que modifica a nivel genético al huésped. No lo mata. Lo cambia. Lo hace más apto."',
     '"El problema es el período de transición. La especie tarda generaciones en estabilizarse. Durante ese tiempo es errática, vulnerable, peligrosa no por agresión sino por confusión. Es lo que estamos viendo."',
-    'Mira: "Y Human Chain lo liberó."',
+    'Mirai: "Y Human Chain lo liberó."',
     '"No fue accidente. Hay memos. Hay decisiones. Alguien creyó que podía controlarlo. Y alguien más creyó que si la nueva especie emergía, era mejor que nosotros ya no estuviéramos para competir."',
     '"El archivo. Nivel 3. Hay nombres."'],
     flag:'curiosidad',
@@ -699,7 +780,7 @@ const STORY = {
     '"No me maten. Primero escuchen."',
     'La versión corta: el virus, Human Chain, el Informe Abismo.',
     '"Todo está en el archivo. Nivel 3."',
-    '"¿Qué planeaban?", pregunta Mira.',
+    '"¿Qué planeaban?", pregunta Mirai.',
     '"Rendición ordenada. Esas son las palabras que usaron."',
     'Una pausa. "Nosotros somos la especie dominante."'],
     choices:[{text:'Ir al archivo de nivel 3',next:'act3_archivo_directo'}]},
@@ -722,7 +803,7 @@ const STORY = {
     'Human Chain fue fundada seis meses después.',
     'El mandato real, memo interno, página 87: "gestionar la transición de la especie dominante de manera que minimice el conflicto y maximice la continuidad del orden establecido".',
     '"Gestionar la transición."',
-    'Mira lee los nombres en voz alta. Uno por uno.',
+    'Mirai lee los nombres en voz alta. Uno por uno.',
     'Vos escuchás y pensás en la fase 4 en la madriguera, que no te atacó. En la cría debajo de la fase 2. En el sonido circular de las fase 3 de noche.',
     'No eran el enemigo.',
     'Nunca lo fueron.',
@@ -730,8 +811,8 @@ const STORY = {
     choices:[{text:'Continuar',next:'act4_decision'}]},
 
   act4_decision:{id:'act4_decision',act:'ACTO IV — LA VERDAD',location:'Archivo nivel 3',
-    text:['Quedan cuatro: vos, Mira, el 31, Fen.',
-    'Mira: "Hay tres ciudades amuralladas en radio de comunicación. Si transmitimos esto, en doce horas lo sabe todo el mundo."',
+    text:['Quedan cuatro: vos, Mirai, el 31, Fen.',
+    'Mirai: "Hay tres ciudades amuralladas en radio de comunicación. Si transmitimos esto, en doce horas lo sabe todo el mundo."',
     'El 31: "O en doce horas Human Chain manda alguien a silenciarnos."',
     'Fen: "El virus sigue activo. Entre el 12 y 15 por ciento de la población está en transición temprana. No lo saben todavía."',
     'Silencio.',
@@ -776,13 +857,13 @@ const STORY = {
     text:['Caminan con el archivo físico. Quinientas páginas divididas en cuatro mochilas.',
     'El camino de vuelta tarda cuatro días.',
     'Tres veces los observan extintas fase 3 desde la distancia. Ninguna ataca.',
-    'Una tarde, acampando, el 31 saca su registrador y documenta todo lo que vio desde el primer día. Mira hace lo mismo. Vos también.',
+    'Una tarde, acampando, el 31 saca su registrador y documenta todo lo que vio desde el primer día. Mirai hace lo mismo. Vos también.',
     'Llegan a la ciudad. La gente en la muralla los mira llegar como a fantasmas.',
     'Tardan dos semanas en que alguien los escuche.',
     'Pero los escuchan.',
     '—',
     'El proceso no es rápido ni limpio. Human Chain tiene abogados y dinero y gente dispuesta a mentir bajo juramento.',
-    'Pero el archivo es real. Y Kael es real. Y Mira tiene una cicatriz de quemadura que prueba que estuvo ahí.',
+    'Pero el archivo es real. Y Kael es real. Y Mirai tiene una cicatriz de quemadura que prueba que estuvo ahí.',
     'Lento, irregular, con retrocesos, algo empieza a cambiar.',
     'No el mundo. Todavía no.',
     'La conversación.']},
@@ -794,7 +875,7 @@ const STORY = {
     'No es amistad. No es paz diplomática. Es algo más primitivo y más honesto: reconocimiento mutuo.',
     'Hay noches en que el sonido circular de las fase 3 llega desde afuera y los cuatro están sentados escuchándolo y nadie dice nada porque no hay nada que decir que no empobrezca lo que está pasando.',
     'Un día, una fase 4 entra al perímetro. Sola. Se sienta a diez metros. Y espera.',
-    'Mira: "¿Qué querés hacer?"',
+    'Mirai: "¿Qué querés hacer?"',
     'Kael se sienta en el suelo también.',
     'La fase 4 emite un sonido bajo. Sostenido.',
     'Kael no sabe responder. Pero no se mueve.',
@@ -807,7 +888,7 @@ const STORY = {
   final_rendicion:{id:'final_rendicion',type:'ending',act:'FINAL',
     title:'FINAL V — LO QUE SIGUE',subtitle:'Hubo un momento en que también fuimos lo que ellas son.',
     text:['No lo decís en voz alta. No hace falta.',
-    'Mira te mira y asiente, despacio, como si lo supiera desde antes.',
+    'Mirai te mira y asiente, despacio, como si lo supiera desde antes.',
     'El 31 no lo entiende del todo. Fen sí.',
     '"El período de transición dura entre ocho y doce meses. Después..."',
     '"¿Después?"',
@@ -827,6 +908,20 @@ const STORY = {
 };
 
 // ─── ENGINE ──────────────────────────────────────
+
+function showContext(){
+  document.getElementById('context').style.display='flex';
+}
+
+function showSplash(){
+  const ctx = document.getElementById('context');
+  ctx.style.opacity='0';
+  setTimeout(()=>{
+    ctx.style.display='none';
+    ctx.style.opacity='1';
+    document.getElementById('splash').style.display='flex';
+  },500);
+}
 
 function startGame(){
   document.getElementById('splash').style.opacity='0';
@@ -878,7 +973,8 @@ function goTo(nodeId){
 function renderNode(node){
   // topbar
   document.getElementById('tb-act').textContent = node.act || '';
-  document.getElementById('tb-node').textContent = node.id.replace(/_/g,' ').toUpperCase();
+  const tnEl = document.getElementById('tb-node');
+  if(tnEl) tnEl.textContent = node.id.replace(/_/g,' ').toUpperCase();
   document.getElementById('location-text').textContent = node.location || '';
 
   // narrative
@@ -982,31 +1078,50 @@ function renderEnding(node){
   np.appendChild(wrap);
 }
 
-function updateSidebar(){
-  // inventory
-  const inv = document.getElementById('inv-list');
-  if(STATE.inventory.length === 0){
-    inv.innerHTML = '<span class="inv-empty">vacío</span>';
-  } else {
-    inv.innerHTML = STATE.inventory.map(i=>`<div class="inv-item">${i}</div>`).join('');
-  }
+function toggleDrawer(){
+  const d = document.getElementById('drawer');
+  d.classList.toggle('open');
+}
 
-  // flags
+function updateSidebar(){
+  const invHTML = STATE.inventory.length
+    ? STATE.inventory.map(i=>`${i}<br>`).join('')
+    : '—';
+  const invHTMLDesktop = STATE.inventory.length
+    ? STATE.inventory.map(i=>`<div class="sd-inv-item">${i}</div>`).join('')
+    : '<span class="sd-inv-empty">vacío</span>';
+
+  // drawer (móvil)
+  const di = document.getElementById('drawer-inv');
+  if(di) di.innerHTML = invHTML;
+
+  // sidebar desktop
+  const si = document.getElementById('sd-inv');
+  if(si) si.innerHTML = invHTMLDesktop;
+
+  const pct = Math.min(100, Math.round((STATE.visited / NODES_TOTAL)*100));
+
   ['compasion','curiosidad','violencia','lealtad'].forEach(f=>{
-    const dot = document.getElementById('fdot-'+f);
-    const item = document.getElementById('flag-'+f);
-    if(STATE.flags.has(f)){
-      dot.classList.add('active');
-      item.classList.add('active');
-    } else {
-      dot.classList.remove('active');
-      item.classList.remove('active');
-    }
+    const active = STATE.flags.has(f);
+
+    // móvil pip
+    const pip = document.getElementById('pip-'+f);
+    if(pip){ active ? pip.classList.add('active') : pip.classList.remove('active'); }
+
+    // drawer flag
+    const df = document.getElementById('df-'+f);
+    if(df){ active ? df.classList.add('active') : df.classList.remove('active'); }
+
+    // desktop sidebar
+    const sdf = document.getElementById('sdf-'+f);
+    if(sdf){ active ? sdf.classList.add('active') : sdf.classList.remove('active'); }
   });
 
-  // progress
-  const pct = Math.min(100, Math.round((STATE.visited / NODES_TOTAL)*100));
-  document.getElementById('prog-fill').style.width = pct+'%';
+  // progress bars
+  const pm = document.getElementById('prog-mini');
+  if(pm) pm.style.width = pct+'%';
+  const pf = document.getElementById('prog-fill');
+  if(pf) pf.style.width = pct+'%';
 }
 
 function restartGame(){
