@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criaturas de la Extinción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0b0a;
+  --bg2:#141210;
+  --bg3:#1c1916;
+  --border:#2e2820;
+  --border2:#3d3530;
+  --text:#d4cdc4;
+  --text2:#8a8278;
+  --text3:#5a554f;
+  --accent:#c8a96e;
+  --accent2:#8a6d3e;
+  --red:#b04040;
+  --green:#5a8a5a;
+  --mono:'Courier Prime',monospace;
+  --serif:'Libre Baskerville',serif;
+}
+html,body{height:100%;background:var(--bg)}
+body{font-family:var(--serif);color:var(--text);overflow:hidden}
+
+/* ── SPLASH ── */
+#splash{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;padding:40px;text-align:center;z-index:100;
+  transition:opacity 0.8s ease;
+}
+.splash-logo{
+  font-family:var(--mono);font-size:clamp(18px,3vw,28px);
+  letter-spacing:6px;color:var(--accent);
+  border:1px solid var(--accent2);
+  padding:20px 36px;
+  position:relative;
+}
+.splash-logo::before,.splash-logo::after{
+  content:'';position:absolute;width:8px;height:8px;
+  border:1px solid var(--accent2);
+}
+.splash-logo::before{top:-4px;left:-4px;border-right:none;border-bottom:none}
+.splash-logo::after{bottom:-4px;right:-4px;border-left:none;border-top:none}
+.splash-corp{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--text3)}
+.splash-flavor{font-size:15px;font-style:italic;color:var(--text2);max-width:400px;line-height:1.8}
+.splash-start{
+  font-family:var(--mono);font-size:12px;letter-spacing:3px;
+  background:transparent;border:1px solid var(--accent2);
+  color:var(--accent);padding:12px 28px;cursor:pointer;
+  transition:all 0.2s;margin-top:8px;
+}
+.splash-start:hover{background:var(--bg3);border-color:var(--accent)}
+.splash-divider{width:60px;height:1px;background:var(--border2)}
+
+/* ── GAME LAYOUT ── */
+#game{display:none;height:100vh;flex-direction:column}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 20px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.topbar-left{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text3)}
+.topbar-act{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--accent2)}
+.topbar-right{font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+.main{display:flex;flex:1;min-height:0}
+
+/* ── NARRATIVE PANEL ── */
+.narrative-panel{
+  flex:1;display:flex;flex-direction:column;min-width:0;
+  border-right:1px solid var(--border);
+}
+.location-bar{
+  padding:8px 20px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+  font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:1px;
+  display:flex;align-items:center;gap:8px;
+}
+.location-dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.text-area{
+  flex:1;overflow-y:auto;padding:28px 32px;
+  scroll-behavior:smooth;
+}
+.text-area::-webkit-scrollbar{width:3px}
+.text-area::-webkit-scrollbar-track{background:var(--bg)}
+.text-area::-webkit-scrollbar-thumb{background:var(--border2)}
+
+.narrative-para{
+  font-size:16px;line-height:1.85;color:var(--text);
+  margin-bottom:18px;
+  opacity:0;transform:translateY(6px);
+  animation:fadeup 0.4s ease forwards;
+}
+.narrative-quote{
+  font-style:italic;
+  border-left:2px solid var(--accent2);
+  padding-left:16px;
+  color:var(--text2);
+  margin:16px 0;
+  opacity:0;transform:translateY(6px);
+  animation:fadeup 0.4s ease forwards;
+}
+.narrative-sys{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  margin:12px 0;letter-spacing:0.5px;
+  opacity:0;transform:translateY(6px);
+  animation:fadeup 0.4s ease forwards;
+}
+.act-header{
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  color:var(--accent2);margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+  opacity:0;animation:fadeup 0.3s ease forwards;
+}
+@keyframes fadeup{to{opacity:1;transform:translateY(0)}}
+
+/* ── CHOICES ── */
+.choices-area{
+  padding:16px 32px 20px;border-top:1px solid var(--border);
+  flex-shrink:0;background:var(--bg2);
+}
+.choices-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--text3);margin-bottom:12px;
+}
+.choice-btn{
+  display:block;width:100%;text-align:left;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text2);font-family:var(--serif);font-size:14px;
+  padding:10px 14px;margin-bottom:7px;cursor:pointer;
+  transition:all 0.15s;line-height:1.5;
+  position:relative;
+}
+.choice-btn::before{
+  content:attr(data-n);
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  margin-right:10px;
+}
+.choice-btn:hover{
+  border-color:var(--accent2);color:var(--text);background:var(--bg3);
+}
+.choice-btn:hover::before{color:var(--accent)}
+.choice-btn:last-child{margin-bottom:0}
+.choice-btn.locked{opacity:0.3;cursor:not-allowed;pointer-events:none}
+.choice-btn.locked::after{
+  content:' [requiere compasión]';
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:200px;flex-shrink:0;display:flex;flex-direction:column;
+  overflow-y:auto;background:var(--bg2);
+}
+.sidebar::-webkit-scrollbar{width:2px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+
+.sidebar-section{
+  padding:14px 14px 12px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-title{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--text3);margin-bottom:10px;
+}
+.inv-item{
+  font-size:11px;color:var(--text2);
+  padding:4px 0;border-bottom:1px solid var(--border);
+  line-height:1.4;
+}
+.inv-item:last-child{border:none}
+.inv-empty{font-size:11px;color:var(--text3);font-style:italic}
+
+.flag-item{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  padding:3px 0;
+}
+.flag-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.flag-dot.active{background:var(--accent)}
+.flag-item.active{color:var(--text2)}
+
+.progress-section{padding:14px}
+.progress-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px}
+.progress-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent2);transition:width 0.5s ease}
+
+/* ── ENDING ── */
+.ending-wrap{
+  flex:1;overflow-y:auto;padding:40px 32px;
+}
+.ending-wrap::-webkit-scrollbar{width:3px}
+.ending-wrap::-webkit-scrollbar-thumb{background:var(--border2)}
+.ending-title{
+  font-family:var(--mono);font-size:11px;letter-spacing:3px;
+  color:var(--accent);margin-bottom:4px;
+}
+.ending-subtitle{
+  font-style:italic;font-size:13px;color:var(--text3);
+  margin-bottom:32px;padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+.ending-para{
+  font-size:16px;line-height:1.9;margin-bottom:18px;color:var(--text);
+  opacity:0;animation:fadeup 0.5s ease forwards;
+}
+.ending-divider{
+  text-align:center;color:var(--text3);font-family:var(--mono);
+  font-size:11px;margin:20px 0;letter-spacing:3px;
+}
+.restart-btn{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text3);padding:10px 20px;cursor:pointer;
+  transition:all 0.2s;margin-top:20px;display:inline-block;
+}
+.restart-btn:hover{border-color:var(--accent2);color:var(--text2)}
+
+/* ── TRANSITION OVERLAY ── */
+#transition{
+  position:fixed;inset:0;background:var(--bg);
+  opacity:0;pointer-events:none;z-index:50;
+  transition:opacity 0.35s ease;
+}
+#transition.active{opacity:1;pointer-events:all}
+</style>
+</head>
+<body>
+
+<div id="transition"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">CRIATURAS DE LA EXTINCIÓN</div>
+  <div class="splash-corp">human chain corp. // operativo #447</div>
+  <div class="splash-divider"></div>
+  <div class="splash-flavor">En algún momento fuimos lo que ellas son ahora.</div>
+  <button class="splash-start" onclick="startGame()">[ COMENZAR ]</button>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <div class="topbar">
+    <div class="topbar-left" id="tb-corp">HUMAN CHAIN CORP. // CAMPO</div>
+    <div class="topbar-act" id="tb-act"></div>
+    <div class="topbar-right" id="tb-node"></div>
+  </div>
+  <div class="main">
+    <div class="narrative-panel" id="narrative-panel">
+      <div class="location-bar">
+        <div class="location-dot"></div>
+        <span id="location-text">—</span>
+      </div>
+      <div class="text-area" id="text-area"></div>
+      <div class="choices-area" id="choices-area"></div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">INVENTARIO</div>
+        <div id="inv-list"><span class="inv-empty">vacío</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">DECISIONES</div>
+        <div class="flag-item" id="flag-compasion">
+          <div class="flag-dot" id="fdot-compasion"></div>compasión
+        </div>
+        <div class="flag-item" id="flag-curiosidad">
+          <div class="flag-dot" id="fdot-curiosidad"></div>curiosidad
+        </div>
+        <div class="flag-item" id="flag-violencia">
+          <div class="flag-dot" id="fdot-violencia"></div>violencia
+        </div>
+        <div class="flag-item" id="flag-lealtad">
+          <div class="flag-dot" id="fdot-lealtad"></div>lealtad
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label">PROGRESO</div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const NODES_TOTAL = 28;
+
+const STATE = {
+  current: 'prologue',
+  flags: new Set(),
+  inventory: [],
+  visited: 0,
+  health: 100
+};
+
+// ─── STORY DATA ───────────────────────────────────
+
+const STORY = {
+  prologue:{id:'prologue',act:'PRÓLOGO',location:'Ciudad Amurallada — Carso // Incorporación',
+    text:['El formulario de ingreso a Human Chain tiene cuarenta y siete campos. Tardaste veinte minutos en llenarlo. En el campo "Motivación para unirse al Cuerpo de Erradicación", escribiste: necesito el trabajo.',
+    'Nadie lo cuestionó.',
+    'El instructor que entregó los equipos se llama Dren. Tiene una cicatriz en el cuello con la forma de una mordedura. Cuando le preguntaste al compañero de al lado, él movió la cabeza: no preguntes.',
+    'El briefing fue corto. Las Extintas —así las llaman en código de campo— se regeneran lento. Fuego o ácido, destrucción completa, documentar. Siempre en grupos. Nunca solo.',
+    'Tu batallón parte en cuatro horas hacia el Sector Frontera 9. Zona tranquila. Madriguera pequeña, trabajo de rutina.',
+    'Dren dice eso con una cara que no coincide con las palabras.'],
+    choices:[
+      {text:'Revisar el equipo antes de partir',next:'prologue_equipo',flag:'curiosidad'},
+      {text:'Hablar con alguien del batallón',next:'prologue_companero'},
+      {text:'Descansar. Guardar energía.',next:'prologue_descanso'}
+    ]},
+
+  prologue_equipo:{id:'prologue_equipo',act:'PRÓLOGO',location:'Hangar de equipo',
+    text:['El lanzallamas de dotación tiene una calcomanía desgastada en el mango: una mano abierta con una cadena cortada. El logo original de Human Chain.',
+    'El cargador de ácido concentrado: lleno. El traje ignífugo tiene una costura reparada con hilo común en el hombro izquierdo.',
+    'En el fondo de la bolsa encontrás algo que no debería estar ahí: una libreta con nombre en la tapa. VARGAS, C.',
+    'La última entrada dice: "No son lo que nos dijeron. Las que están en fase 4 no atacan si no las atacás primero. Eso no lo saben en la base. O lo saben y no les importa."',
+    'Fecha: hace once días. Vargas no está en el listado del batallón.'],
+    inventory:['Libreta de Vargas'],
+    choices:[
+      {text:'Guardar la libreta y no decir nada',next:'prologue_silencio',flag:'curiosidad'},
+      {text:'Reportarla al instructor Dren',next:'prologue_reporte',flag:'lealtad'}
+    ]},
+
+  prologue_silencio:{id:'prologue_silencio',act:'PRÓLOGO',location:'Hangar de equipo',
+    text:['La libreta entra en el bolsillo interno del traje. Pesa casi nada.',
+    'Quizás Vargas fue reasignado. Quizás se equivocó. Quizás tenía miedo y escribía para calmarse.',
+    'Pero guardás la libreta igual.'],
+    choices:[{text:'Ir al briefing final',next:'act1_partida'}]},
+
+  prologue_reporte:{id:'prologue_reporte',act:'PRÓLOGO',location:'Oficina de Dren',
+    text:['Dren mira la libreta sin tocarla. Después te mira a vos.',
+    '"¿La leíste?"',
+    'Decís que sí.',
+    'Dren agarra la libreta, la dobla, la guarda en su cajón.',
+    '"Vargas tuvo un episodio de estrés postraumático. Sus observaciones no tienen validez operativa. Buen trabajo reportándola."',
+    'Algo en su tono dice exactamente lo contrario de buen trabajo.'],
+    choices:[
+      {text:'Aceptar y retirarte',next:'act1_partida'},
+      {text:'Preguntar dónde está Vargas',next:'prologue_vargas_pregunta'}
+    ]},
+
+  prologue_vargas_pregunta:{id:'prologue_vargas_pregunta',act:'PRÓLOGO',location:'Oficina de Dren',
+    text:['"Vargas está en recuperación en la instalación médica de Carso Central."',
+    'Dren no pestañea cuando lo dice.',
+    '"¿Algo más?"',
+    'No hay nada más. O sí, pero no acá, no ahora.',
+    'Salís con la sensación de haber cometido un error que todavía no podés medir.'],
+    flag:'curiosidad',
+    choices:[{text:'Ir al briefing final',next:'act1_partida'}]},
+
+  prologue_companero:{id:'prologue_companero',act:'PRÓLOGO',location:'Barracas',
+    text:['El que está más cerca se llama Mira. Parche #22 en el hombro: veintidós operativos.',
+    '"Primera salida", te dice. No es una pregunta.',
+    '"Las fase 1 y 2 son fáciles. Las fase 3 ya duele verlas porque se parecen a algo que reconocés pero no podés nombrar. Las fase 4..." Se detiene.',
+    '"¿Las fase 4?"',
+    '"Rezá para no encontrar una fase 4. No porque sean más peligrosas. Sino porque si encontrás una vas a tener que tomar una decisión y después vivir con ella."',
+    'Mira se da vuelta y cierra los ojos.'],
+    choices:[
+      {text:'Preguntarle qué decisión',next:'prologue_decision_pregunta'},
+      {text:'Dejarla descansar',next:'act1_partida'}
+    ]},
+
+  prologue_decision_pregunta:{id:'prologue_decision_pregunta',act:'PRÓLOGO',location:'Barracas',
+    text:['Mira abre un ojo.',
+    '"Si seguís o si parás."',
+    '"¿Seguir haciendo qué?"',
+    'El ojo se cierra de nuevo.',
+    '"El trabajo."'],
+    flag:'curiosidad',
+    choices:[{text:'Ir al briefing final',next:'act1_partida'}]},
+
+  prologue_descanso:{id:'prologue_descanso',act:'PRÓLOGO',location:'Barracas',
+    text:['Cerrás los ojos.',
+    'Soñás con agua. Con algo moviéndose debajo. Con la sensación de que lo que está debajo no es amenaza, es simplemente otra cosa que existe en paralelo.',
+    'El despertador del batallón suena a las 5:00 AM.',
+    'La imagen del agua tarda en irse.'],
+    choices:[{text:'Levantarse y prepararse',next:'act1_partida'}]},
+
+  act1_partida:{id:'act1_partida',act:'ACTO I — LA EMBOSCADA',location:'Sector Frontera 9 // 06:40 AM',
+    text:['El transporte huele a combustible y a algo más que preferís no identificar.',
+    'Son doce en el batallón. El líder de campo es Cassov, que habla poco y camina delante siempre.',
+    'Objetivo: madriguera estimada de veinte a treinta unidades, mayoría fase 1 y 2. Terreno abierto.',
+    'Kael: flanco derecho con otros tres. Protocolo claro: fuego primero, ácido para completar, documentar cada baja.',
+    'Diez minutos que se sienten como mucho menos.'],
+    choices:[
+      {text:'Revisar el perímetro antes de la orden',next:'act1_perimetro',flag:'curiosidad'},
+      {text:'Mantener posición y esperar',next:'act1_espera'},
+      {text:'Hablar con Cassov',next:'act1_cassov'}
+    ]},
+
+  act1_perimetro:{id:'act1_perimetro',act:'ACTO I — LA EMBOSCADA',location:'Perímetro norte',
+    text:['A doscientos metros del punto de entrada, el suelo cambia de algo difícil de nombrar.',
+    'Marcas circulares en la tierra. Perfectamente regulares.',
+    'Más allá: tres criaturas fase 2 en cuclillas, quietas, mirando hacia el interior de la planta.',
+    'No hacia vos. Adentro. Como si vigilaran algo.',
+    '"Kael, posición. Treinta segundos."'],
+    choices:[
+      {text:'Reportar la posición inusual',next:'act1_reporte_perimetro',flag:'lealtad'},
+      {text:'Eliminarlas silenciosamente',next:'act1_elimina_perimetro',flag:'violencia'},
+      {text:'Observar un segundo más',next:'act1_observa_perimetro',flag:'curiosidad'}
+    ]},
+
+  act1_observa_perimetro:{id:'act1_observa_perimetro',act:'ACTO I — LA EMBOSCADA',location:'Perímetro norte',
+    text:['Una criatura gira la cabeza hacia las otras dos. Emite un sonido breve.',
+    'Las otras se reorganizan. Una se desplaza tres metros. La otra retrocede.',
+    'Coordinación deliberada. No instinto de manada.',
+    'La radio: Kael. Ahora.',
+    'Volvés corriendo. No decís nada sobre lo que viste. Pero lo guardás.'],
+    flag:'compasion',
+    choices:[{text:'Unirse al avance',next:'act1_avance'}]},
+
+  act1_reporte_perimetro:{id:'act1_reporte_perimetro',act:'ACTO I — LA EMBOSCADA',location:'Perímetro norte',
+    text:['Cassov escucha el reporte.',
+    '"Comportamiento inusual. Puede indicar más unidades. Ajustamos formación."',
+    'Cassov te mira un segundo antes de dar la orden de avance.',
+    '"Buen ojo", dice. Solo eso.'],
+    choices:[{text:'Avanzar con el batallón',next:'act1_avance'}]},
+
+  act1_elimina_perimetro:{id:'act1_elimina_perimetro',act:'ACTO I — LA EMBOSCADA',location:'Perímetro norte',
+    text:['Tres disparos de ácido. Las criaturas no tuvieron tiempo de reaccionar.',
+    'Mientras se disuelven, notás que rodeaban algo: un hueco cubierto con ramas apiladas con demasiada precisión.',
+    'No tenés tiempo de investigar. La orden de avance llega.'],
+    choices:[{text:'Avanzar con el batallón',next:'act1_avance'}]},
+
+  act1_espera:{id:'act1_espera',act:'ACTO I — LA EMBOSCADA',location:'Punto de concentración',
+    text:['Esperás. Mira está a tu izquierda mirando el horizonte con una expresión que no es miedo exactamente.',
+    'La orden llega. Avance en formación delta.',
+    'La planta se ve abandonada desde afuera. Ventanas rotas, óxido, silencio.',
+    'Cassov levanta el puño. Parada.',
+    'Algo se mueve adentro. Demasiado para veinte unidades.'],
+    choices:[{text:'Avanzar',next:'act1_avance'}]},
+
+  act1_cassov:{id:'act1_cassov',act:'ACTO I — LA EMBOSCADA',location:'Punto de concentración',
+    text:['"¿Cuántas salidas tiene la planta?"',
+    'Cassov te mira. No era una pregunta que esperaba de un novato.',
+    '"Cuatro confirmadas. Dos probables no mapeadas."',
+    '"¿Y si hay más unidades que las estimadas?"',
+    '"Entonces protocolo es retirada ordenada y refuerzos. No ser héroe." Te sostiene la mirada. "¿Entendido?"',
+    'Algo en esa conversación sentís que fue importante.'],
+    choices:[{text:'Avanzar con el batallón',next:'act1_avance'}]},
+
+  act1_avance:{id:'act1_avance',act:'ACTO I — LA EMBOSCADA',location:'Interior — Planta de tratamiento',
+    text:['La planta es un laberinto de caños oxidados y pasarelas rotas.',
+    'Fase 1 y 2: exactamente lo que dijeron. Caen sin problema.',
+    'Cassov levanta el puño. Silencio total.',
+    'Desde el piso de metal llega un sonido. Regular. Como si algo contara.',
+    'El piso cede.'],
+    choices:[{text:'Continuar',next:'act1_madriguera'}]},
+
+  act1_madriguera:{id:'act1_madriguera',act:'ACTO I — LA EMBOSCADA',location:'Sub-nivel — Madriguera principal',
+    text:['Caés tres metros. Dos compañeros caen con vos.',
+    'Lo que está abajo no es una madriguera pequeña. Es una cámara. Enorme. Llena.',
+    'Fase 3. Docenas. Se mueven con demasiada intención.',
+    'En el centro, rodeada de las demás, quieta. Mirándote.',
+    'Fase 4.',
+    'Arriba: disparos. Gritos. La radio explota en caos.',
+    'Los compañeros corren hacia el único túnel visible. Uno te grita que te muevas.'],
+    choices:[
+      {text:'Seguir a los compañeros',next:'act1_tunel_escape'},
+      {text:'No moverte. Ver si la fase 4 ataca.',next:'act1_fase4_espera',flag:'curiosidad'},
+      {text:'Disparar hacia la fase 4',next:'act1_fase4_ataque',flag:'violencia'}
+    ]},
+
+  act1_fase4_espera:{id:'act1_fase4_espera',act:'ACTO I — LA EMBOSCADA',location:'Sub-nivel — Madriguera',
+    text:['No te movés.',
+    'La fase 4 tampoco.',
+    'Las otras se agitan, pero la fase 4 levanta algo que podría ser una mano y el caos se calma.',
+    'Cuatro segundos de silencio. Vos y eso, mirándose.',
+    'Después la fase 4 hace un movimiento lateral, lento. Las otras abren un camino.',
+    'Hacia el túnel.',
+    'No te atacó. Te abrió el camino.'],
+    flag:'compasion',
+    choices:[{text:'Ir hacia el túnel',next:'act1_tunel_escape'}]},
+
+  act1_fase4_ataque:{id:'act1_fase4_ataque',act:'ACTO I — LA EMBOSCADA',location:'Sub-nivel — Madriguera',
+    text:['El disparo de ácido golpea el borde de la criatura. Erró por el movimiento.',
+    'La cámara explota en movimiento. Todo a la vez.',
+    'Corré.'],
+    health:-20,
+    choices:[{text:'Correr al túnel',next:'act1_tunel_forzado'}]},
+
+  act1_tunel_forzado:{id:'act1_tunel_forzado',act:'ACTO I — LA EMBOSCADA',location:'Túnel de escape',
+    text:['Corrés con extintas encima. Una agarra el hombro del traje. La costura del hombro izquierdo cede.',
+    'Entrás rodando. Tu compañero cierra la compuerta. Algo golpea del otro lado, dos veces. Después nada.',
+    'Perdiste al otro compañero.'],
+    health:-10,
+    choices:[{text:'Seguir por el túnel',next:'act1_aftermath'}]},
+
+  act1_tunel_escape:{id:'act1_tunel_escape',act:'ACTO I — LA EMBOSCADA',location:'Túnel de escape',
+    text:['El túnel es estrecho y huele a tierra húmeda.',
+    'Detrás hay sonidos pero nada los sigue de cerca.',
+    'Cien metros. Una escotilla de metal. La forzás.',
+    'Estás afuera. La planta arde a trescientos metros.',
+    'La radio: voces que no reconocés, estática, el nombre de Cassov con urgencia. Después silencio.',
+    '"¿Y los demás?", dice un compañero.',
+    'No hay respuesta posible todavía.'],
+    choices:[{text:'Continuar',next:'act1_aftermath'}]},
+
+  act1_aftermath:{id:'act1_aftermath',act:'ACTO I — LA EMBOSCADA',location:'Campo abierto // Tarde',
+    text:['De doce, quedaron tres afuera. Vos, Mira —quemaduras en el brazo, callada— y el parche #31.',
+    'La radio sin señal. El transporte no está.',
+    'La base más cercana: cuarenta kilómetros al norte. Zona no controlada.',
+    '"Podemos esperar rescate o podemos empezar a caminar."',
+    'El 31: "Si hay rescate, ya estaría acá."',
+    'Mira no responde. Eso es una respuesta.'],
+    choices:[
+      {text:'Empezar a caminar ahora, antes de que anochezca',next:'act2_inicio_marcha'},
+      {text:'Esperar hasta el amanecer',next:'act2_espera_noche'}
+    ]},
+
+  act2_inicio_marcha:{id:'act2_inicio_marcha',act:'ACTO II — EL CAMINO',location:'Ruta norte // Atardecer',
+    text:['Marchán en silencio. La zona no controlada no se ve apocalíptica. Es casi hermosa de una manera que incomoda: vegetación que recuperó el asfalto, un río que nadie limpió y que por eso volvió solo a ser transparente.',
+    'A los ocho kilómetros, el 31 para.',
+    '"Hay una."',
+    'En el borde del camino, junto a una vieja parada, hay una criatura fase 2. Sola. Acurrucada sobre algo.'],
+    choices:[
+      {text:'Eliminarla de inmediato',next:'act2_elimina_sola',flag:'violencia'},
+      {text:'Acercarse para ver qué hace',next:'act2_observa_sola',flag:'curiosidad'},
+      {text:'Rodear y evitar el contacto',next:'act2_rodea_sola'}
+    ]},
+
+  act2_espera_noche:{id:'act2_espera_noche',act:'ACTO II — EL CAMINO',location:'Refugio provisional // Noche',
+    text:['Se esconden en hormigón semi-derrumbado. Turnos de guardia de dos horas.',
+    'En tu turno, a las 2 AM: movimiento afuera. Cuatro criaturas fase 3. Sentadas. En círculo.',
+    'No cazan. No duermen.',
+    'Una emite un sonido bajo, sostenido. Las otras lo replican, una por una, hasta que el sonido se vuelve: conjunto.',
+    'Siguen así cuarenta minutos. Después se van.',
+    'Cuando amanece, marchán. No decís nada sobre lo que viste.'],
+    flag:'compasion',
+    choices:[{text:'Continuar la marcha al amanecer',next:'act2_marcha_dia'}]},
+
+  act2_elimina_sola:{id:'act2_elimina_sola',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 8',
+    text:['El disparo de ácido es limpio.',
+    'Debajo: algo pequeño, envuelto en material orgánico. Una cría. Viva.',
+    'El 31 ya levantó el arma.',
+    'Mira dice: "Protocolo."'],
+    choices:[
+      {text:'Seguir el protocolo',next:'act2_protocolo_cria',flag:'violencia'},
+      {text:'Negarte a completar',next:'act2_niega_cria',flag:'compasion'}
+    ]},
+
+  act2_protocolo_cria:{id:'act2_protocolo_cria',act:'ACTO II — EL CAMINO',location:'Ruta norte',
+    text:['El 31 completa la eliminación. Mira documenta. Vos mirás hacia el camino.',
+    'Ninguno dice nada.',
+    'Seguís marchando.'],
+    choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
+
+  act2_niega_cria:{id:'act2_niega_cria',act:'ACTO II — EL CAMINO',location:'Ruta norte',
+    text:['"No."',
+    'El 31 te mira. "Es protocolo."',
+    '"Lo sé."',
+    'Mira baja el arma del 31 con la mano. Lentamente.',
+    '"Seguimos."',
+    'La cría queda atrás. A un kilómetro el 31 dice, en voz baja: "¿Cuántas veces ya hicimos esto?"',
+    'Nadie responde. Pero algo cambió.'],
+    choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
+
+  act2_observa_sola:{id:'act2_observa_sola',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 8',
+    text:['La criatura no reacciona. Está sobre algo: una cría. La fase 2 la cubre con su cuerpo.',
+    'La criatura levanta la vista. Te mira. Sus ojos —que el manual llama "fotorreceptores sin función cognitiva superior"— te sostienen la mirada durante tres segundos.',
+    'No ataca.',
+    'El 31 llega con el arma levantada.',
+    '"Kael. Apartate."'],
+    flag:'compasion',
+    choices:[
+      {text:'Apartarte y dejar que el 31 actúe',next:'act2_protocolo_cria',flag:'violencia'},
+      {text:'Ponerte en el medio',next:'act2_medio',flag:'compasion'},
+      {text:'Pedir que esperen, documentar',next:'act2_documenta_cria',flag:'curiosidad'}
+    ]},
+
+  act2_medio:{id:'act2_medio',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 8',
+    text:['Te ponés en el medio.',
+    'El 31 baja el arma de sorpresa.',
+    'La criatura fase 2 no te ataca. La cría se mueve debajo.',
+    'Mira: "No podemos quedarnos acá." "Lo sé." Te corrés despacio. "Seguimos."',
+    'El 31 mira la criatura. La criatura lo mira a él. Después el 31 baja el arma completamente y sigue caminando.',
+    'No dice nada en el resto del día.'],
+    choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
+
+  act2_documenta_cria:{id:'act2_documenta_cria',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 8',
+    text:['"Esperen. Documentando comportamiento fase 2. Protección activa de cría. Sin agresión ante presencia humana."',
+    'Treinta segundos de registro. La criatura no se mueve.',
+    '"Listo. Seguimos."',
+    'El 31: "Eso debería estar en algún informe."',
+    'Mira: "Lo estará." Ninguno suena convencido.'],
+    inventory:['Registro — comportamiento fase 2'],
+    flag:'curiosidad',
+    choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
+
+  act2_rodea_sola:{id:'act2_rodea_sola',act:'ACTO II — EL CAMINO',location:'Ruta norte',
+    text:['Rodean. La criatura no los sigue.',
+    'El 31: "¿Qué tenía?"',
+    'Mira: "Una cría."',
+    '"¿Cómo sabés?"',
+    '"Porque las vi antes. Muchas veces."',
+    'Nadie dice más.'],
+    choices:[{text:'Continuar',next:'act2_marcha_dia'}]},
+
+  act2_marcha_dia:{id:'act2_marcha_dia',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 18 — Mediodía',
+    text:['A mitad del camino: restos de otro batallón. Más antiguo. Logo viejo de Human Chain, la mano con cadena cortada.',
+    'Sin cuerpos. Solo equipo, vehículos volcados, marcas de combate.',
+    'Pintado en el asfalto con ácido de equipo: dos palabras.',
+    '"NO SON."'],
+    choices:[
+      {text:'Buscar contexto en los restos',next:'act2_restos_batallon',flag:'curiosidad'},
+      {text:'Documentar y seguir',next:'act2_sigue_sin_investigar'},
+      {text:'Es propaganda antigobierno. Seguir.',next:'act2_descarta_mensaje',flag:'lealtad'}
+    ]},
+
+  act2_restos_batallon:{id:'act2_restos_batallon',act:'ACTO II — EL CAMINO',location:'Zona de restos',
+    text:['En un vehículo: una tableta de campo, batería al 3%.',
+    'Diario de operaciones. Última entrada, Operaria R. Souza:',
+    '"Encontramos una colonia fase 3 en el sector 12. No atacaron. Nos rodearon. Eso no es lo que hace una especie instintiva. Eso es lo que hace una especie que evalúa."',
+    '"Pedimos instrucciones sobre protocolo ante comportamiento no agresivo. Respuesta: protocolo estándar. No hay otra opción."',
+    '"No voy a escribir lo que pasó hoy. Solo voy a decir que Marcos se fue. Y que entiendo por qué."',
+    'La tableta muere.'],
+    inventory:['Fragmento — diario Souza'],
+    flag:'curiosidad',
+    choices:[{text:'Continuar hacia la base',next:'act2_ultimo_tramo'}]},
+
+  act2_sigue_sin_investigar:{id:'act2_sigue_sin_investigar',act:'ACTO II — EL CAMINO',location:'Ruta norte',
+    text:['Marchán. Las dos palabras quedan atrás.',
+    'Mira y el 31 miraron la inscripción más tiempo del necesario para leerla.'],
+    choices:[{text:'Continuar',next:'act2_ultimo_tramo'}]},
+
+  act2_descarta_mensaje:{id:'act2_descarta_mensaje',act:'ACTO II — EL CAMINO',location:'Ruta norte',
+    text:['El 31 asiente. Propaganda.',
+    'Mira no dice nada.',
+    'A doscientos metros Mira dice: "Las primeras células humanas también eran solo organismos que querían sobrevivir."',
+    'El 31: "Eso es diferente."',
+    '"¿Por qué?"',
+    'El 31 no responde.'],
+    choices:[{text:'Continuar',next:'act2_ultimo_tramo'}]},
+
+  act2_ultimo_tramo:{id:'act2_ultimo_tramo',act:'ACTO II — EL CAMINO',location:'Ruta norte // Km 35 — Tarde',
+    text:['A cinco kilómetros de la base, el viento trae olor a quemado.',
+    'Mira para en seco.',
+    'Donde debería estar la base, hay humo negro, espeso, del tipo que significa que algo que no debería arder está ardiendo.',
+    '"Puede ser un ejercicio", dice el 31.',
+    'Mira no responde. Vos tampoco.',
+    'El olor no es de ejercicio.'],
+    choices:[
+      {text:'Acercarse rápido, pueden necesitar ayuda',next:'act3_llegada_rapida'},
+      {text:'Acercarse con cautela, evaluar primero',next:'act3_llegada_cautelosa',flag:'curiosidad'}
+    ]},
+
+  act3_llegada_rapida:{id:'act3_llegada_rapida',act:'ACTO III — LA BASE',location:'Base Frontera Norte // Entrada',
+    text:['La puerta: abierta. No forzada. Dejada así al salir apurado.',
+    'Silencio adentro. Y daño.',
+    'Los edificios de barracas destruidos desde adentro, no desde afuera.',
+    'El 31 revisa el primer cuerpo. Uniforme Human Chain. Sin mordedura, sin ataque de extintas.',
+    'Mira: "Esto no lo hicieron ellas."',
+    'Movimiento en el edificio de administración.'],
+    choices:[
+      {text:'Ir hacia el movimiento',next:'act3_movimiento_admin'},
+      {text:'Ir directo al archivo',next:'act3_archivo_directo',flag:'curiosidad'}
+    ]},
+
+  act3_llegada_cautelosa:{id:'act3_llegada_cautelosa',act:'ACTO III — LA BASE',location:'Perímetro exterior',
+    text:['Diez minutos de observación. Sin movimiento de extintas. Sin movimiento humano.',
+    'Señal de radio en frecuencia de emergencia. Morse. Mira descifra:',
+    '"Dice: archivo. Solo eso, repetido."',
+    'Entran por el acceso lateral, sin daño visible.'],
+    choices:[
+      {text:'Buscar al que envía la señal',next:'act3_busca_señal'},
+      {text:'Ir directo al archivo',next:'act3_archivo_directo'}
+    ]},
+
+  act3_busca_señal:{id:'act3_busca_señal',act:'ACTO III — LA BASE',location:'Sala de comunicaciones',
+    text:['La señal viene del subsuelo. Un técnico herido en la pierna, escondido bajo una consola. Fen.',
+    '"El archivo del nivel 3. Tienen que llegar ahí."',
+    'Se detiene. Mira al 31: "¿Cuánto tiempo en Human Chain?"',
+    '"Dieciocho meses."',
+    '"¿Leyeron alguna vez el Informe Abismo?"',
+    'Nadie responde.',
+    '"El virus no era desconocido. Lo sabían. Lo tenían desde hace doce años."'],
+    choices:[
+      {text:'Ir al archivo',next:'act3_archivo_directo'},
+      {text:'Escuchar todo lo que sabe',next:'act3_fen_completo',flag:'curiosidad'}
+    ]},
+
+  act3_fen_completo:{id:'act3_fen_completo',act:'ACTO III — LA BASE',location:'Sala de comunicaciones',
+    text:['"Lo sacaron de una fosa oceánica en el Atlántico sur. Hace doce años. Un ARN mensajero que modifica a nivel genético al huésped. No lo mata. Lo cambia. Lo hace más apto."',
+    '"El problema es el período de transición. La especie tarda generaciones en estabilizarse. Durante ese tiempo es errática, vulnerable, peligrosa no por agresión sino por confusión. Es lo que estamos viendo."',
+    'Mira: "Y Human Chain lo liberó."',
+    '"No fue accidente. Hay memos. Hay decisiones. Alguien creyó que podía controlarlo. Y alguien más creyó que si la nueva especie emergía, era mejor que nosotros ya no estuviéramos para competir."',
+    '"El archivo. Nivel 3. Hay nombres."'],
+    flag:'curiosidad',
+    choices:[{text:'Ir al archivo',next:'act3_archivo_directo'}]},
+
+  act3_movimiento_admin:{id:'act3_movimiento_admin',act:'ACTO III — LA BASE',location:'Edificio de administración',
+    text:['Era Fen, un técnico herido, arrastrándose.',
+    '"No me maten. Primero escuchen."',
+    'La versión corta: el virus, Human Chain, el Informe Abismo.',
+    '"Todo está en el archivo. Nivel 3."',
+    '"¿Qué planeaban?", pregunta Mira.',
+    '"Rendición ordenada. Esas son las palabras que usaron."',
+    'Una pausa. "Nosotros somos la especie dominante."'],
+    choices:[{text:'Ir al archivo de nivel 3',next:'act3_archivo_directo'}]},
+
+  act3_archivo_directo:{id:'act3_archivo_directo',act:'ACTO III — LA BASE',location:'Archivo nivel 3 — Subsuelo',
+    text:['El nivel 3 requiere credencial especial.',
+    'El 31 busca en sus bolsillos. Saca una credencial que no es la suya. CASSOV, R.',
+    '"¿Cuándo...?"',
+    '"Cuando caí con ella. Ya estaba..." Se detiene.',
+    'La credencial de Cassov abre la puerta.',
+    'El archivo del nivel 3 no es un servidor. Es papel. Documentos impresos.',
+    'Alguien no quería que esto estuviera en una red.'],
+    inventory:['Credencial Cassov — nivel 3'],
+    choices:[{text:'Leer el archivo',next:'act4_la_verdad'}]},
+
+  act4_la_verdad:{id:'act4_la_verdad',act:'ACTO IV — LA VERDAD',location:'Archivo nivel 3',
+    text:['El Informe Abismo tiene cuatrocientas páginas. Solo leen las primeras veinte y es suficiente.',
+    'El virus fue encontrado en 2029 en una fosa oceánica a once kilómetros de profundidad. El equipo de investigación empezó a cambiar tres meses después. No de forma violenta. Gradualmente: mayor empatía, comunicación no verbal espontánea, reducción de comportamientos competitivos.',
+    'El equipo fue "retirado por razones de seguridad biológica".',
+    'Human Chain fue fundada seis meses después.',
+    'El mandato real, memo interno, página 87: "gestionar la transición de la especie dominante de manera que minimice el conflicto y maximice la continuidad del orden establecido".',
+    '"Gestionar la transición."',
+    'Mira lee los nombres en voz alta. Uno por uno.',
+    'Vos escuchás y pensás en la fase 4 en la madriguera, que no te atacó. En la cría debajo de la fase 2. En el sonido circular de las fase 3 de noche.',
+    'No eran el enemigo.',
+    'Nunca lo fueron.',
+    'Éramos nosotros.'],
+    choices:[{text:'Continuar',next:'act4_decision'}]},
+
+  act4_decision:{id:'act4_decision',act:'ACTO IV — LA VERDAD',location:'Archivo nivel 3',
+    text:['Quedan cuatro: vos, Mira, el 31, Fen.',
+    'Mira: "Hay tres ciudades amuralladas en radio de comunicación. Si transmitimos esto, en doce horas lo sabe todo el mundo."',
+    'El 31: "O en doce horas Human Chain manda alguien a silenciarnos."',
+    'Fen: "El virus sigue activo. Entre el 12 y 15 por ciento de la población está en transición temprana. No lo saben todavía."',
+    'Silencio.',
+    '"¿Qué hacemos?", pregunta el 31. Y te mira a vos.'],
+    choices:[
+      {text:'Transmitir el archivo a todas las ciudades',next:'final_transmision'},
+      {text:'Destruir el archivo',next:'final_destruccion'},
+      {text:'Llevar el archivo físicamente a la ciudad',next:'final_viaje'},
+      {text:'Quedarse. Encontrar una forma de coexistir.',next:'final_coexistencia',flag_required:'compasion'},
+      {text:'Someterse al virus. Ser parte de lo que viene.',next:'final_rendicion',flag_required:'compasion'}
+    ]},
+
+  final_transmision:{id:'final_transmision',type:'ending',act:'FINAL',
+    title:'FINAL I — LA VOZ',subtitle:'La verdad no salva. Pero obliga.',
+    text:['Fen conecta el equipo de transmisión. La señal va en texto, audio, imagen. Todo el archivo, en todas las frecuencias.',
+    'Human Chain tarda cuarenta minutos en responder. Para entonces ya es tarde.',
+    'Las ciudades amuralladas entran en caos. No el caos del miedo. El caos de algo que no tiene nombre todavía: la comprensión masiva de que el mundo fue construido sobre una decisión que nadie tomó con ellos.',
+    'Human Chain cae en semanas. Los nombres del archivo son juzgados, algunos. Otros desaparecen.',
+    'Pero el virus sigue activo. Y la nueva especie sigue emergiendo. Y el 15% en transición empieza a reconocerse entre sí.',
+    'Lo que transmitiste no detuvo nada. Solo cambió quién sabe qué.',
+    'Eso, a veces, es suficiente.',
+    '—',
+    'Kael vive en zona no controlada durante tres años más. Documentando. Observando.',
+    'Escribe que las extintas empezaron a dejar comida cerca de los asentamientos humanos.',
+    'No lo reporta a nadie. Lo escribe igual.']},
+
+  final_destruccion:{id:'final_destruccion',type:'ending',act:'FINAL',
+    title:'FINAL II — EL SILENCIO',subtitle:'Hay verdades que no se transmiten. Se acumulan.',
+    text:['El archivo arde. Cuatrocientas páginas de papel que nadie quiso que estuviera en una red.',
+    'Human Chain no sabe qué perdió. Sin los documentos fundacionales, sin la estructura del encubrimiento, la corporación empieza a contraerse. Lentamente, como algo que se desangra sin saber dónde está la herida.',
+    'Lo que no desaparece es el virus. Lo que no desaparece es la nueva especie.',
+    'Los cuatro salen con lo que llevan encima. Sin pruebas. Sin nombres. Solo con lo que saben.',
+    'A veces eso es más peligroso que cualquier archivo.',
+    '—',
+    'El 31 empezó a dar clases en una ciudad amurallada. Historia natural.',
+    'Sus alumnos preguntan por qué las extintas no atacan si no las atacás.',
+    'Él responde: no sé. Pero deberíamos averiguarlo.',
+    'Es la primera vez que Human Chain no tiene una respuesta oficial lista.']},
+
+  final_viaje:{id:'final_viaje',type:'ending',act:'FINAL',
+    title:'FINAL III — EL MENSAJERO',subtitle:'Cuarenta kilómetros de ida. El resto de una vida de vuelta.',
+    text:['Caminan con el archivo físico. Quinientas páginas divididas en cuatro mochilas.',
+    'El camino de vuelta tarda cuatro días.',
+    'Tres veces los observan extintas fase 3 desde la distancia. Ninguna ataca.',
+    'Una tarde, acampando, el 31 saca su registrador y documenta todo lo que vio desde el primer día. Mira hace lo mismo. Vos también.',
+    'Llegan a la ciudad. La gente en la muralla los mira llegar como a fantasmas.',
+    'Tardan dos semanas en que alguien los escuche.',
+    'Pero los escuchan.',
+    '—',
+    'El proceso no es rápido ni limpio. Human Chain tiene abogados y dinero y gente dispuesta a mentir bajo juramento.',
+    'Pero el archivo es real. Y Kael es real. Y Mira tiene una cicatriz de quemadura que prueba que estuvo ahí.',
+    'Lento, irregular, con retrocesos, algo empieza a cambiar.',
+    'No el mundo. Todavía no.',
+    'La conversación.']},
+
+  final_coexistencia:{id:'final_coexistencia',type:'ending',act:'FINAL',
+    title:'FINAL IV — EL BORDE',subtitle:'No toda transición necesita un ganador.',
+    text:['No huyen.',
+    'Las extintas los saben ahí. Al principio mantienen distancia. Después, gradualmente, la distancia disminuye.',
+    'No es amistad. No es paz diplomática. Es algo más primitivo y más honesto: reconocimiento mutuo.',
+    'Hay noches en que el sonido circular de las fase 3 llega desde afuera y los cuatro están sentados escuchándolo y nadie dice nada porque no hay nada que decir que no empobrezca lo que está pasando.',
+    'Un día, una fase 4 entra al perímetro. Sola. Se sienta a diez metros. Y espera.',
+    'Mira: "¿Qué querés hacer?"',
+    'Kael se sienta en el suelo también.',
+    'La fase 4 emite un sonido bajo. Sostenido.',
+    'Kael no sabe responder. Pero no se mueve.',
+    '—',
+    'El informe de Human Chain dice: "instalación perdida por ataque masivo. Sin sobrevivientes."',
+    'Los sobrevivientes leen eso dos años después, cuando alguien lo filtra.',
+    'Se ríen. Es la primera vez que se ríen en mucho tiempo.'],
+    flag_required:'compasion'},
+
+  final_rendicion:{id:'final_rendicion',type:'ending',act:'FINAL',
+    title:'FINAL V — LO QUE SIGUE',subtitle:'Hubo un momento en que también fuimos lo que ellas son.',
+    text:['No lo decís en voz alta. No hace falta.',
+    'Mira te mira y asiente, despacio, como si lo supiera desde antes.',
+    'El 31 no lo entiende del todo. Fen sí.',
+    '"El período de transición dura entre ocho y doce meses. Después..."',
+    '"¿Después?"',
+    '"No lo sé. Nadie que llegó al final volvió para contarlo. Porque ya no son ellos."',
+    '"¿Eso es malo?", preguntás.',
+    'Fen piensa. "Depende de quién lo pregunta."',
+    '—',
+    'Los registros de Human Chain muestran que Kael murió en el operativo del Sector 9.',
+    'En algún lugar de la zona no controlada, algo que antes fue Kael aprende a reconocer el sonido circular de las fase 3.',
+    'Tarda tres semanas en poder responderlo.',
+    'Cuando lo hace, algo a su alrededor se detiene un momento, escucha, y después el círculo se abre para incluir una voz más.',
+    'Lo que fue humano no desapareció.',
+    'Se volvió otra cosa.',
+    'Como ya pasó antes.',
+    'Como volverá a pasar.'],
+    flag_required:'compasion'}
+};
+
+// ─── ENGINE ──────────────────────────────────────
+
+function startGame(){
+  document.getElementById('splash').style.opacity='0';
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('game').style.display='flex';
+    goTo('prologue');
+  },800);
+}
+
+function goTo(nodeId){
+  const node = STORY[nodeId];
+  if(!node) return;
+
+  // transition
+  const ov = document.getElementById('transition');
+  ov.classList.add('active');
+
+  setTimeout(()=>{
+    STATE.current = nodeId;
+    STATE.visited++;
+
+    // apply flag
+    if(node.flag) STATE.flags.add(node.flag);
+    if(node.flag_remove) STATE.flags.delete(node.flag_remove);
+
+    // apply inventory
+    if(node.inventory){
+      node.inventory.forEach(item=>{
+        if(!STATE.inventory.includes(item)) STATE.inventory.push(item);
+      });
+    }
+
+    // apply health
+    if(node.health) STATE.health = Math.max(0, STATE.health + node.health);
+
+    if(node.type === 'ending'){
+      renderEnding(node);
+    } else {
+      renderNode(node);
+    }
+
+    updateSidebar();
+
+    ov.classList.remove('active');
+  }, 350);
+}
+
+function renderNode(node){
+  // topbar
+  document.getElementById('tb-act').textContent = node.act || '';
+  document.getElementById('tb-node').textContent = node.id.replace(/_/g,' ').toUpperCase();
+  document.getElementById('location-text').textContent = node.location || '';
+
+  // narrative
+  const ta = document.getElementById('text-area');
+  ta.innerHTML = '';
+
+  // act header
+  const h = document.createElement('div');
+  h.className = 'act-header';
+  h.textContent = '// ' + (node.act||'').toUpperCase();
+  h.style.animationDelay = '0ms';
+  ta.appendChild(h);
+
+  // paragraphs
+  (node.text||[]).forEach((para, i)=>{
+    const p = document.createElement('p');
+    p.className = para.startsWith('"') ? 'narrative-quote' : 'narrative-para';
+    p.textContent = para;
+    p.style.animationDelay = (80 + i*60)+'ms';
+    ta.appendChild(p);
+  });
+
+  // choices
+  renderChoices(node.choices||[]);
+
+  ta.scrollTop = 0;
+}
+
+function renderChoices(choices){
+  const ca = document.getElementById('choices-area');
+  ca.innerHTML = '<div class="choices-label">DECIDÍS</div>';
+
+  choices.forEach((c, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.setAttribute('data-n', (i+1)+'.');
+    btn.textContent = c.text;
+
+    const locked = c.flag_required && !STATE.flags.has(c.flag_required);
+    if(locked){
+      btn.classList.add('locked');
+    } else {
+      btn.onclick = ()=>{
+        if(c.flag) STATE.flags.add(c.flag);
+        goTo(c.next);
+      };
+    }
+    ca.appendChild(btn);
+  });
+}
+
+function renderEnding(node){
+  document.getElementById('tb-act').textContent = 'EPÍLOGO';
+  document.getElementById('location-text').textContent = node.title || '';
+
+  const ta = document.getElementById('text-area');
+  const ca = document.getElementById('choices-area');
+
+  ta.innerHTML = '';
+  ca.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ending-wrap';
+
+  const title = document.createElement('div');
+  title.className = 'ending-title';
+  title.textContent = node.title;
+  wrap.appendChild(title);
+
+  const sub = document.createElement('div');
+  sub.className = 'ending-subtitle';
+  sub.textContent = node.subtitle;
+  wrap.appendChild(sub);
+
+  (node.text||[]).forEach((para, i)=>{
+    if(para === '—'){
+      const d = document.createElement('div');
+      d.className = 'ending-divider';
+      d.textContent = '—';
+      d.style.animationDelay = (100+i*70)+'ms';
+      wrap.appendChild(d);
+    } else {
+      const p = document.createElement('p');
+      p.className = 'ending-para';
+      p.textContent = para;
+      p.style.animationDelay = (100+i*70)+'ms';
+      wrap.appendChild(p);
+    }
+  });
+
+  const restartBtn = document.createElement('button');
+  restartBtn.className = 'restart-btn';
+  restartBtn.textContent = '[ NUEVA PARTIDA ]';
+  restartBtn.onclick = restartGame;
+  wrap.appendChild(restartBtn);
+
+  // replace narrative panel content
+  const np = document.getElementById('narrative-panel');
+  np.querySelector('.text-area').remove();
+  np.querySelector('.choices-area').remove();
+  np.appendChild(wrap);
+}
+
+function updateSidebar(){
+  // inventory
+  const inv = document.getElementById('inv-list');
+  if(STATE.inventory.length === 0){
+    inv.innerHTML = '<span class="inv-empty">vacío</span>';
+  } else {
+    inv.innerHTML = STATE.inventory.map(i=>`<div class="inv-item">${i}</div>`).join('');
+  }
+
+  // flags
+  ['compasion','curiosidad','violencia','lealtad'].forEach(f=>{
+    const dot = document.getElementById('fdot-'+f);
+    const item = document.getElementById('flag-'+f);
+    if(STATE.flags.has(f)){
+      dot.classList.add('active');
+      item.classList.add('active');
+    } else {
+      dot.classList.remove('active');
+      item.classList.remove('active');
+    }
+  });
+
+  // progress
+  const pct = Math.min(100, Math.round((STATE.visited / NODES_TOTAL)*100));
+  document.getElementById('prog-fill').style.width = pct+'%';
+}
+
+function restartGame(){
+  STATE.current = 'prologue';
+  STATE.flags = new Set();
+  STATE.inventory = [];
+  STATE.visited = 0;
+  STATE.health = 100;
+
+  const np = document.getElementById('narrative-panel');
+  if(!np.querySelector('.text-area')){
+    const ta = document.createElement('div');
+    ta.className = 'text-area';
+    ta.id = 'text-area';
+    np.insertBefore(ta, np.querySelector('.location-bar').nextSibling);
+  }
+  if(!np.querySelector('.choices-area')){
+    const ca = document.createElement('div');
+    ca.className = 'choices-area';
+    ca.id = 'choices-area';
+    np.appendChild(ca);
+  }
+  const ew = np.querySelector('.ending-wrap');
+  if(ew) ew.remove();
+
+  goTo('prologue');
+}
+</script>
+</body>
+</html>
